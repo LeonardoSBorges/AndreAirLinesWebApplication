@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AndreAirLinesWebApplication.Migrations
 {
     [DbContext(typeof(AndreAirLinesWebApplicationContext))]
-    [Migration("20220401174027_version10")]
+    [Migration("20220402041548_version1.0")]
     partial class version10
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,7 +109,7 @@ namespace AndreAirLinesWebApplication.Migrations
 
                     b.HasIndex("EnderecoId");
 
-                    b.ToTable("Passageiros");
+                    b.ToTable("Passageiro");
                 });
 
             modelBuilder.Entity("AndreAirLinesWebApplication.Model.Voo", b =>

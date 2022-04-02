@@ -107,7 +107,7 @@ namespace AndreAirLinesWebApplication.Migrations
 
                     b.HasIndex("EnderecoId");
 
-                    b.ToTable("Passageiros");
+                    b.ToTable("Passageiro");
                 });
 
             modelBuilder.Entity("AndreAirLinesWebApplication.Model.Voo", b =>

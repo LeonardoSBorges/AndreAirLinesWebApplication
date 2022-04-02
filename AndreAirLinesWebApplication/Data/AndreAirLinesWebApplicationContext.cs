@@ -14,7 +14,7 @@ namespace AndreAirLinesWebApplication.Data
         {
         }
 
-        public DbSet<AndreAirLinesWebApplication.Model.Passageiro> Passageiros { get; set; }
+        public DbSet<AndreAirLinesWebApplication.Model.Passageiro> Passageiro { get; set; }
 
         public DbSet<AndreAirLinesWebApplication.Model.Endereco> Endereco { get; set; }
 

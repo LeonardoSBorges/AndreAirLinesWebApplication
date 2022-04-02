@@ -29,14 +29,14 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Passageiro>>> GetPassageiros()
         {
-            return await _context.Passageiros.Include(e=>e.Endereco).ToListAsync();
+            return await _context.Passageiro.Include(e=>e.Endereco).ToListAsync();
         }
 
         // GET: api/Passageiros/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Passageiro>> GetPassageiros(string id)
         {
-            var passageiros = await _context.Passageiros.Include(x => x.Endereco).Where(d => d.Cpf == id).FirstOrDefaultAsync();
+            var passageiros = await _context.Passageiro.Include(x => x.Endereco).Where(d => d.Cpf == id).FirstOrDefaultAsync();
 
             if (passageiros == null)
             {
@@ -83,19 +83,22 @@ namespace AndreAirLinesWebApplication.Controllers
         public async Task<ActionResult<Passageiro>> PostPassageiros(PassageiroDTO passageiros)
         {
             Endereco endereco = null;
+            Passageiro pessoa = null;
             try
             {
                 Endereco verificaEndereco = await _context.Endereco.Where(c => c.CEP == passageiros.CEP).FirstOrDefaultAsync();
                 if(verificaEndereco == null) {
                     endereco = await HTTPCorreios(passageiros.CEP);
+                    if (endereco.CEP == null)
+                        throw new Exception("Nao existe o cep digitado");
                     endereco.Numero = passageiros.Numero;
                 }
                 else
                     endereco = verificaEndereco;
                 
 
-                var pessoa = new Passageiro(passageiros.Cpf, passageiros.Nome, passageiros.Telefone, passageiros.DataNascimento, passageiros.Email, endereco);
-                _context.Passageiros.Add(pessoa);
+                pessoa = new Passageiro(passageiros.Cpf, passageiros.Nome, passageiros.Telefone, passageiros.DataNascimento, passageiros.Email, endereco);
+                _context.Passageiro.Add(pessoa);
                 await _context.SaveChangesAsync();
 
             }
@@ -111,20 +114,20 @@ namespace AndreAirLinesWebApplication.Controllers
                 }
             }
 
-            return CreatedAtAction("GetPassageiros", new { id = passageiros.Cpf }, passageiros);
+            return CreatedAtAction("GetPassageiros", new { id = pessoa.Cpf }, pessoa);
         }
 
         // DELETE: api/Passageiros/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePassageiros(string id)
         {
-            var passageiros = await _context.Passageiros.FindAsync(id);
+            var passageiros = await _context.Passageiro.FindAsync(id);
             if (passageiros == null)
             {
                 return NotFound();
             }
 
-            _context.Passageiros.Remove(passageiros);
+            _context.Passageiro.Remove(passageiros);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -132,7 +135,7 @@ namespace AndreAirLinesWebApplication.Controllers
 
         private bool PassageirosExists(string id)
         {
-            return _context.Passageiros.Any(e => e.Cpf == id);
+            return _context.Passageiro.Any(e => e.Cpf == id);
         }
 
         private async Task<Endereco> HTTPCorreios(string cep)

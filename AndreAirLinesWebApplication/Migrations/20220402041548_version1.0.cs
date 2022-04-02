@@ -58,7 +58,7 @@ namespace AndreAirLinesWebApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Passageiros",
+                name: "Passageiro",
                 columns: table => new
                 {
                     Cpf = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -70,9 +70,9 @@ namespace AndreAirLinesWebApplication.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Passageiros", x => x.Cpf);
+                    table.PrimaryKey("PK_Passageiro", x => x.Cpf);
                     table.ForeignKey(
-                        name: "FK_Passageiros_Endereco_EnderecoId",
+                        name: "FK_Passageiro_Endereco_EnderecoId",
                         column: x => x.EnderecoId,
                         principalTable: "Endereco",
                         principalColumn: "Id",
@@ -114,9 +114,9 @@ namespace AndreAirLinesWebApplication.Migrations
                         principalColumn: "Sigla",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Voo_Passageiros_PassageiroCpf",
+                        name: "FK_Voo_Passageiro_PassageiroCpf",
                         column: x => x.PassageiroCpf,
-                        principalTable: "Passageiros",
+                        principalTable: "Passageiro",
                         principalColumn: "Cpf",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -127,8 +127,8 @@ namespace AndreAirLinesWebApplication.Migrations
                 column: "EnderecoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Passageiros_EnderecoId",
-                table: "Passageiros",
+                name: "IX_Passageiro_EnderecoId",
+                table: "Passageiro",
                 column: "EnderecoId");
 
             migrationBuilder.CreateIndex(
@@ -164,7 +164,7 @@ namespace AndreAirLinesWebApplication.Migrations
                 name: "Aeroporto");
 
             migrationBuilder.DropTable(
-                name: "Passageiros");
+                name: "Passageiro");
 
             migrationBuilder.DropTable(
                 name: "Endereco");

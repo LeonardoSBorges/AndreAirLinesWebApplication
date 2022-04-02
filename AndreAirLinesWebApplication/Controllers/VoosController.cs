@@ -29,10 +29,12 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Voo>>> GetVoo()
         {
-            return await _context.Voo
-                        .Include(x => x.Origem)
-                        .Include(x=>x.Destino)
-                        .Include(x=>x.Passageiro).ToListAsync();
+            var result = await _context.Voo
+                        .Include(enderecoDestino => enderecoDestino.Origem.Endereco)
+                        .Include(enderecoOrigem => enderecoOrigem.Destino.Endereco)
+                        .Include(a => a.Aeronave)
+                        .Include(x => x.Passageiro.Endereco).ToListAsync();
+            return result;
         }
 
         // GET: api/Voos/5
@@ -91,8 +93,12 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpPost]
         public async Task<ActionResult<VooDTO>> PostVoo(VooDTO vooDTO)
         {
-            Voo Voo = new Voo();
-
+            Voo Voo;
+            var destino = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.destino).FirstOrDefaultAsync();
+            var origem = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.origem).FirstOrDefaultAsync();
+            var aeronave = await _context.Aeronave.Where(identificacao => identificacao.Id == vooDTO.aeronave).FirstOrDefaultAsync();
+            var passageiro = await _context.Passageiro.Where(pessoa => pessoa.Cpf == vooDTO.cpf).FirstOrDefaultAsync();
+            Voo = new Voo(destino, origem, aeronave, vooDTO.HorarioEmbarque, vooDTO.HorarioDesenbarque, passageiro);
             
             _context.Voo.Add(Voo);
             await _context.SaveChangesAsync();
