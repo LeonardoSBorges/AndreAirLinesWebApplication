@@ -32,8 +32,8 @@ namespace AndreAirLinesWebApplication.Controllers
             var result = await _context.Voo
                         .Include(enderecoDestino => enderecoDestino.Origem.Endereco)
                         .Include(enderecoOrigem => enderecoOrigem.Destino.Endereco)
-                        .Include(a => a.Aeronave)
-                        .Include(x => x.Passageiro.Endereco).ToListAsync();
+                        .Include(procuraAeronave => procuraAeronave.Aeronave)
+                        .ToListAsync();
             return result;
         }
 
@@ -41,10 +41,10 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Voo>> GetVoo(int id)
         {
-            var voo = await _context.Voo.Include(x => x.Origem)
-                                        .Include(x => x.Destino)
-                                        .Include(x => x.Passageiro)
-                                        .Include(x => x.Aeronave)
+            var voo = await _context.Voo
+                        .Include(enderecoDestino => enderecoDestino.Origem.Endereco)
+                        .Include(enderecoOrigem => enderecoOrigem.Destino.Endereco)
+                        .Include(procuraAeronave => procuraAeronave.Aeronave)
                                         .Where(x => x.Id == id)
                                         .FirstOrDefaultAsync();
                                         
@@ -97,8 +97,7 @@ namespace AndreAirLinesWebApplication.Controllers
             var destino = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.destino).FirstOrDefaultAsync();
             var origem = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.origem).FirstOrDefaultAsync();
             var aeronave = await _context.Aeronave.Where(identificacao => identificacao.Id == vooDTO.aeronave).FirstOrDefaultAsync();
-            var passageiro = await _context.Passageiro.Where(pessoa => pessoa.Cpf == vooDTO.cpf).FirstOrDefaultAsync();
-            Voo = new Voo(destino, origem, aeronave, vooDTO.HorarioEmbarque, vooDTO.HorarioDesenbarque, passageiro);
+            Voo = new Voo(destino, origem, aeronave, vooDTO.HorarioEmbarque, vooDTO.HorarioDesenbarque);
             
             _context.Voo.Add(Voo);
             await _context.SaveChangesAsync();

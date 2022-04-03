@@ -16,7 +16,6 @@ namespace AndreAirLinesWebApplication.Model
         [DisplayFormat(DataFormatString = "0: yyyy/MM/dd", ApplyFormatInEditMode = true)]
         public DateTime HorarioEmbarque { get; set; }
         public DateTime HorarioDesenbarque { get; set; }
-        public Passageiro Passageiro { get; set; }
         #endregion
 
         #region Constructor
@@ -25,14 +24,13 @@ namespace AndreAirLinesWebApplication.Model
 
         }
 
-        public Voo(Aeroporto destino, Aeroporto origem, Aeronave aeronave, DateTime horarioEmbarque, DateTime horarioDesembarque, Passageiro passageiro)
+        public Voo(Aeroporto destino, Aeroporto origem, Aeronave aeronave, DateTime horarioEmbarque, DateTime horarioDesembarque)
         {
             Destino = destino;
             Origem = origem;
             Aeronave = aeronave;
             HorarioDesenbarque = horarioDesembarque;
             HorarioEmbarque = horarioEmbarque;
-            Passageiro = passageiro;
         }
         #endregion
     }

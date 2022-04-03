@@ -23,5 +23,9 @@ namespace AndreAirLinesWebApplication.Data
         public DbSet<AndreAirLinesWebApplication.Model.Aeronave> Aeronave { get; set; }
 
         public DbSet<AndreAirLinesWebApplication.Model.Voo> Voo { get; set; }
+
+        public DbSet<AndreAirLinesWebApplication.Model.Passagem> Passagem { get; set; }
+
+        public DbSet<AndreAirLinesWebApplication.Model.Classe> Classe { get; set; }
     }
 }

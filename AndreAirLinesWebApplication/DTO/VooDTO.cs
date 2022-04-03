@@ -9,7 +9,6 @@ namespace AndreAirLinesWebApplication.DTO
         public string aeronave { get; set; }
         public DateTime HorarioEmbarque { get; set; }
         public DateTime HorarioDesenbarque { get; set; }
-        public string cpf { get; set; }
 
     }
 }
