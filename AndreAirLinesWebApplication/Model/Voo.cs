@@ -8,7 +8,6 @@ namespace AndreAirLinesWebApplication.Model
     {
         #region Properties
         [Key]
-        [JsonIgnore]
         public int Id { get; set; }
         public Aeroporto Destino { get; set; }
         public Aeroporto Origem { get; set; }

@@ -105,7 +105,7 @@ namespace AndreAirLinesWebApplication.Controllers
             Aeroporto aeroporto = null;
             try
             {
-                var aeroportoExists = _context.Aeroporto.Where(procuraAeroporto => procuraAeroporto.Sigla == aeroportoDTO.sigla).FirstOrDefaultAsync();
+                Aeroporto aeroportoExists = await _context.Aeroporto.Where(procuraAeroporto => procuraAeroporto.Sigla == aeroportoDTO.sigla).FirstOrDefaultAsync();
                 if (aeroportoExists != null)
                     throw new Exception("Aeropor already Exists");
 
