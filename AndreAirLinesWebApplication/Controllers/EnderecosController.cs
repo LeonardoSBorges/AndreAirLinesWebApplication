@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AndreAirLinesWebApplication.Data;
 using AndreAirLinesWebApplication.Model;
+using AndreAirLinesWebApplication.DTO;
+using AndreAirLinesWebApplication.Service;
 
 namespace AndreAirLinesWebApplication.Controllers
 {
@@ -47,6 +49,12 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEndereco(int id, Endereco endereco)
         {
+            var enderecoExists = await _context.Endereco.Where(procuraEndereco => procuraEndereco.Id == id).ToListAsync();
+
+            if (enderecoExists == null)
+                throw new Exception("Endereco not exists");
+
+
             if (id != endereco.Id)
             {
                 return BadRequest();
@@ -76,12 +84,29 @@ namespace AndreAirLinesWebApplication.Controllers
         // POST: api/Enderecoes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Endereco>> PostEndereco(Endereco endereco)
+        public async Task<ActionResult<Endereco>> PostEndereco(EnderecoDTO enderecoDTO)
         {
-            _context.Endereco.Add(endereco);
-            await _context.SaveChangesAsync();
+            Endereco enderecoCompleto = null;
+            try
+            {
+                var enderecoExists = await _context.Endereco.Where(endereco => endereco.CEP == enderecoDTO.cep).FirstOrDefaultAsync();
 
-            return CreatedAtAction("GetEndereco", new { id = endereco.Id }, endereco);
+                if (enderecoExists != null)
+                    throw new Exception("Endereco already exists");
+
+                enderecoCompleto = await ViaCepCorreiosService.HTTPCorreios(enderecoDTO.cep);
+                if (enderecoCompleto != null)
+                {
+                    _context.Endereco.Add(enderecoCompleto);
+                }
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                Console.WriteLine("Exception DataBase Update: " + exception);
+            }
+            return CreatedAtAction("GetEndereco", new { id = enderecoCompleto.CEP }, enderecoCompleto);
         }
 
         // DELETE: api/Enderecoes/5

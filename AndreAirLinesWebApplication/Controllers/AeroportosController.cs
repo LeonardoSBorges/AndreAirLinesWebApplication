@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using AndreAirLinesWebApplication.DTO;
 using System.Net.Http.Headers;
+using AndreAirLinesWebApplication.Service;
 
 namespace AndreAirLinesWebApplication.Controllers
 {
@@ -50,9 +51,25 @@ namespace AndreAirLinesWebApplication.Controllers
         // PUT: api/Aeroportoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAeroporto(string id, Aeroporto aeroporto)
+        public async Task<IActionResult> PutAeroporto(string id, AeroportoDTO aeroportoDTO)
         {
+            
 
+            var aeroportoExists = await _context.Aeroporto.Where(aeroporto => aeroporto.Sigla == id).FirstOrDefaultAsync();
+
+            if (aeroportoExists == null)
+                throw new Exception("register not found");
+
+            var enderecoAeroporto = await _context.Endereco.Where(endereco => endereco.CEP == aeroportoDTO.cep).FirstOrDefaultAsync();
+            if (enderecoAeroporto == null)
+            {
+                enderecoAeroporto = await ViaCepCorreiosService.HTTPCorreios(aeroportoDTO.cep);
+                enderecoAeroporto.Numero = aeroportoDTO.numero;
+            }
+
+            Aeroporto aeroporto = new Aeroporto(aeroportoDTO.sigla, aeroportoDTO.nome, enderecoAeroporto);
+
+            
             if (id != aeroporto.Sigla)
             {
                 return BadRequest();
@@ -88,13 +105,16 @@ namespace AndreAirLinesWebApplication.Controllers
             Aeroporto aeroporto = null;
             try
             {
+                var aeroportoExists = _context.Aeroporto.Where(procuraAeroporto => procuraAeroporto.Sigla == aeroportoDTO.sigla).FirstOrDefaultAsync();
+                if (aeroportoExists != null)
+                    throw new Exception("Aeropor already Exists");
+
                 var verificaEndereco = _context.Endereco.Where(x => x.CEP == aeroportoDTO.cep).FirstOrDefault();
                 if (verificaEndereco == null)
                 {
                     verificaEndereco = await HTTPCorreios(aeroportoDTO.cep);
                     verificaEndereco.Numero = aeroportoDTO.numero;
                 }
-                    
 
                 aeroporto = new Aeroporto(aeroportoDTO.sigla, aeroportoDTO.nome, verificaEndereco);
                 _context.Aeroporto.Add(aeroporto);

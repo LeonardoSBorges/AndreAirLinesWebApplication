@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AndreAirLinesWebApplication.Migrations
 {
     [DbContext(typeof(AndreAirLinesWebApplicationContext))]
-    [Migration("20220402041548_version1.0")]
-    partial class version10
+    [Migration("20220402194812_Version1.0")]
+    partial class Version10
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

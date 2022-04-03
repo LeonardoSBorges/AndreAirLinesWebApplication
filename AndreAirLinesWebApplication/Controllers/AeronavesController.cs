@@ -78,9 +78,15 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpPost]
         public async Task<ActionResult<Aeronave>> PostAeronave(Aeronave aeronave)
         {
-            _context.Aeronave.Add(aeronave);
+            var verificaAeronave =  _context.Aeronave.Where(procurarAeronave => procurarAeronave.Id == aeronave.Id).FirstOrDefault();
+
+            
             try
             {
+                if (verificaAeronave != null)
+                    throw new Exception("Aeronave already exists");
+
+                _context.Aeronave.Add(aeronave);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)

@@ -1,4 +1,5 @@
 ﻿using System;
+using AndreAirLinesWebApplication.Service;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ namespace AndreAirLinesWebApplication.Controllers
     public class PassageirosController : ControllerBase
     {
         private readonly AndreAirLinesWebApplicationContext _context;
-
         public PassageirosController(AndreAirLinesWebApplicationContext context)
         {
             _context = context;
@@ -29,7 +29,7 @@ namespace AndreAirLinesWebApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Passageiro>>> GetPassageiros()
         {
-            return await _context.Passageiro.Include(e=>e.Endereco).ToListAsync();
+            return await _context.Passageiro.Include(e => e.Endereco).ToListAsync();
         }
 
         // GET: api/Passageiros/5
@@ -49,14 +49,25 @@ namespace AndreAirLinesWebApplication.Controllers
         // PUT: api/Passageiros/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPassageiros(string id, Passageiro passageiros)
+        public async Task<IActionResult> PutPassageiros(string id, PassageiroDTO passageiroDTO)
         {
-            if (id != passageiros.Cpf)
+            var passageiroExists = await _context.Passageiro.Where(procuraPassageiro => procuraPassageiro.Cpf == id).FirstOrDefaultAsync();
+
+            if (passageiroExists == null)
+                throw new Exception("passageiro not found");
+            var endereco = await _context.Endereco.Include(procuraEndereco => procuraEndereco.CEP == passageiroDTO.CEP).FirstOrDefaultAsync();
+            if (endereco == null) {
+                endereco = await ViaCepCorreiosService.HTTPCorreios(passageiroDTO.CEP);
+                endereco.Numero = passageiroDTO.Numero;
+            }
+            var passageiro = new Passageiro(passageiroDTO.Cpf, passageiroDTO.Nome, passageiroDTO.Telefone, passageiroDTO.DataNascimento, passageiroDTO.Email, endereco);
+
+            if (id != passageiro.Cpf)
             {
                 return BadRequest();
             }
 
-            _context.Entry(passageiros).State = EntityState.Modified;
+            _context.Entry(passageiro).State = EntityState.Modified;
 
             try
             {
@@ -80,31 +91,36 @@ namespace AndreAirLinesWebApplication.Controllers
         // POST: api/Passageiros
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Passageiro>> PostPassageiros(PassageiroDTO passageiros)
+        public async Task<ActionResult<Passageiro>> PostPassageiros(PassageiroDTO passageiro)
         {
             Endereco endereco = null;
             Passageiro pessoa = null;
+            var passageiroExiste = await _context.Passageiro.Where(passageiro => passageiro.Cpf == passageiro.Cpf).FirstOrDefaultAsync();
             try
             {
-                Endereco verificaEndereco = await _context.Endereco.Where(c => c.CEP == passageiros.CEP).FirstOrDefaultAsync();
-                if(verificaEndereco == null) {
-                    endereco = await HTTPCorreios(passageiros.CEP);
-                    if (endereco.CEP == null)
-                        throw new Exception("Nao existe o cep digitado");
-                    endereco.Numero = passageiros.Numero;
-                }
-                else
-                    endereco = verificaEndereco;
+                if (passageiroExiste != null)
+                    throw new Exception("Passageiro already exists");
+
+                    Endereco verificaEndereco = await _context.Endereco.Where(c => c.CEP == passageiro.CEP).FirstOrDefaultAsync();
+                    if (verificaEndereco == null)
+                    {
+                        endereco = await ViaCepCorreiosService.HTTPCorreios(passageiro.CEP);
+                        if (endereco.CEP == null)
+                            throw new Exception("the cep not exists");
+                        endereco.Numero = passageiro.Numero;
+                    }
+                    else
+                        endereco = verificaEndereco;
+
+
+                    pessoa = new Passageiro(passageiro.Cpf, passageiro.Nome, passageiro.Telefone, passageiro.DataNascimento, passageiro.Email, endereco);
+                    _context.Passageiro.Add(pessoa);
+                    await _context.SaveChangesAsync();
                 
-
-                pessoa = new Passageiro(passageiros.Cpf, passageiros.Nome, passageiros.Telefone, passageiros.DataNascimento, passageiros.Email, endereco);
-                _context.Passageiro.Add(pessoa);
-                await _context.SaveChangesAsync();
-
             }
             catch (DbUpdateException)
             {
-                if (PassageirosExists(passageiros.Cpf))
+                if (PassageirosExists(passageiro.Cpf))
                 {
                     return Conflict();
                 }
@@ -113,7 +129,6 @@ namespace AndreAirLinesWebApplication.Controllers
                     throw;
                 }
             }
-
             return CreatedAtAction("GetPassageiros", new { id = pessoa.Cpf }, pessoa);
         }
 
@@ -138,20 +153,6 @@ namespace AndreAirLinesWebApplication.Controllers
             return _context.Passageiro.Any(e => e.Cpf == id);
         }
 
-        private async Task<Endereco> HTTPCorreios(string cep)
-        {
-            var client = new HttpClient();
-
-            client.BaseAddress = new Uri("https://viacep.com.br/");
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = await client.GetAsync($"ws/{cep}/json/"); 
-
-            ViaCepDTO viaCep = await response.Content.ReadFromJsonAsync<ViaCepDTO>();
-
-            var endereco = new Endereco(viaCep.bairro, viaCep.localidade, viaCep.cep, viaCep.logradouro, viaCep.uf);
-            return endereco;
-        }
+        
     }
 }

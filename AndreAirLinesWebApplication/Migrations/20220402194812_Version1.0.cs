@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AndreAirLinesWebApplication.Migrations
 {
-    public partial class version10 : Migration
+    public partial class Version10 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
