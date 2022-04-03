@@ -27,5 +27,7 @@ namespace AndreAirLinesWebApplication.Data
         public DbSet<AndreAirLinesWebApplication.Model.Passagem> Passagem { get; set; }
 
         public DbSet<AndreAirLinesWebApplication.Model.Classe> Classe { get; set; }
+
+        public DbSet<AndreAirLinesWebApplication.Model.PrecoBase> PrecoBase { get; set; }
     }
 }

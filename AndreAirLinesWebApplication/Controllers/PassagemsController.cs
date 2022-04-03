@@ -95,13 +95,16 @@ namespace AndreAirLinesWebApplication.Controllers
                 .Where(procuraVoo => procuraVoo.Id == passagemDTO.IdVoo).FirstOrDefaultAsync();
             Classe Classe = await _context.Classe
                 .Where(procuraClasse => procuraClasse.Id.Equals(passagemDTO.IdClasse)).FirstOrDefaultAsync();
+            PrecoBase PrecoBase = await _context.PrecoBase
+                .Include(precoBase => precoBase.Origem.Endereco)
+                .Include(precoBase => precoBase.Destino.Endereco)
+                .Include(precoBase => precoBase.Classe)
+                .Where(precoBase => precoBase.Id == passagemDTO.PrecoBaseID).FirstOrDefaultAsync();
+
+
+
+            Passagem passagem = new Passagem(Voo, Passageiro, passagemDTO.PrecoBaseID, Classe);
             
-            Passagem passagem = new Passagem(Voo, Passageiro, 100, Classe);
-            
-
-
-
-
             _context.Passagem.Add(passagem);
             await _context.SaveChangesAsync();
 
