@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -8,14 +9,23 @@ namespace AndreAirLinesWebApplication.Model
     {
         #region Properties
         [Key]
+        [JsonProperty("id")]
         public int Id { get; set; }
+        [JsonProperty("destino")]
         public Aeroporto Destino { get; set; }
+        [JsonProperty("origem")]
         public Aeroporto Origem { get; set; }
+        [JsonProperty("aeronave")]
         public Aeronave Aeronave { get; set; }
+        [JsonProperty("horarioEmbarque")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "0: yyyy/MM/dd", ApplyFormatInEditMode = true)]
         public DateTime HorarioEmbarque { get; set; }
-        public DateTime HorarioDesenbarque { get; set; }
+
+        [JsonProperty("horarioDesembarque")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "0: yyyy/MM/dd", ApplyFormatInEditMode = true)]
+        public DateTime HorarioDesembarque { get; set; }
         #endregion
 
         #region Constructor
@@ -29,7 +39,7 @@ namespace AndreAirLinesWebApplication.Model
             Destino = destino;
             Origem = origem;
             Aeronave = aeronave;
-            HorarioDesenbarque = horarioDesembarque;
+            HorarioDesembarque = horarioDesembarque;
             HorarioEmbarque = horarioEmbarque;
         }
         #endregion

@@ -97,7 +97,7 @@ namespace AndreAirLinesWebApplication.Controllers
             var destino = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.destino).FirstOrDefaultAsync();
             var origem = await _context.Aeroporto.Where(endereco => endereco.Sigla == vooDTO.origem).FirstOrDefaultAsync();
             var aeronave = await _context.Aeronave.Where(identificacao => identificacao.Id == vooDTO.aeronave).FirstOrDefaultAsync();
-            Voo = new Voo(destino, origem, aeronave, vooDTO.HorarioEmbarque, vooDTO.HorarioDesenbarque);
+            Voo = new Voo(destino, origem, aeronave, vooDTO.HorarioEmbarque, vooDTO.HorarioDesembarque);
             
             _context.Voo.Add(Voo);
             await _context.SaveChangesAsync();

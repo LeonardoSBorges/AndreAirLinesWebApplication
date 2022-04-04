@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace AndreAirLinesWebApplication.Model
 {
@@ -6,8 +7,11 @@ namespace AndreAirLinesWebApplication.Model
     {
         #region Properties
         [Key]
+        [JsonProperty("id")]
         public string Id { get; set; }
+        [JsonProperty("nome")]
         public string Nome { get; set; }
+        [JsonProperty("capacidade")]
         public int Capacidade { get; set; }
         #endregion
         #region Constructor
